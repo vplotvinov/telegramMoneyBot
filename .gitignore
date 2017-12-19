@@ -2,5 +2,5 @@
 node_modules/
 config/config.json
 !.gitkeep
-ctr.pem
+crt.pem
 key.pem
