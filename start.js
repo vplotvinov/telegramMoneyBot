@@ -7,7 +7,7 @@ var rp = require('request-promise');
 var answer = {
     bitcoin: '',
     ether: '',
-    info: 'Write "e" for get Ethereum OR "b" for get Bitcoin',
+    info: 'Write "e" for get Ethereum OR "b" for get Bitcoin. For get all, please write "all"',
     other: 'Write "info" for get information',
 }
 
@@ -22,8 +22,8 @@ bot.on('message', function (msg) {
           var dataBitcoin = body[0];
           var dataEther = body[1];
 
-          answer.bitcoin = 'Bitcoin now: $' + dataBitcoin.price_usd + '\n Last Update: ' + new Date(Number(dataEther.last_updated));
-          answer.ether = 'Ethereum now: $' + dataEther.price_usd + '\n Last Update: ' + new Date(Number(dataEther.last_updated));
+          answer.bitcoin = 'Bitcoin now: $' + dataBitcoin.price_usd + '\nLast Update: ' + new Date(Number(dataBitcoin.last_updated + '000'));
+          answer.ether = 'Ethereum now: $' + dataEther.price_usd + '\nLast Update: ' + new Date(Number(dataEther.last_updated + '000'));
           sendMessage(fromId, msg.text);
       } else {
           error = 'Get data error';
@@ -34,23 +34,22 @@ bot.on('message', function (msg) {
 
 function sendMessage(fromId, fromMessageText) {
 
-  if (fromMessageText === 'e') {
-    bot.sendMessage(fromId, answer.ether);
+  fromMessageText = fromMessageText.toLowerCase();
 
-    return;
+  switch(fromMessageText) {
+    case 'e':
+      bot.sendMessage(fromId, answer.ether);
+      break;
+    case 'b':
+      bot.sendMessage(fromId, answer.bitcoin);
+      break;
+    case 'all':
+      bot.sendMessage(fromId, answer.bitcoin + '\n' + answer.ether);
+      break;
+    case 'info':
+      bot.sendMessage(fromId, answer.info);
+      break;
+    default:
+      bot.sendMessage(fromId, answer.other);
   }
-
-  if (fromMessageText === 'b') {
-    bot.sendMessage(fromId, answer.bitcoin);
-
-    return;
-  }
-
-  if (fromMessageText === 'info') {
-    bot.sendMessage(fromId, answer.info);
-
-    return;
-  }
-
-  bot.sendMessage(fromId, answer.other);
 }
