@@ -5,63 +5,81 @@ var bot = new TelegramBot(config.token.qa, {polling: true});
 var rp = require('request-promise');
 
 var answer = {
-    bitcoin: '',
-    ether: '',
-    bitcoin_cash: '',
-    iota: '',
     info: 'Write "e" for get Ethereum \n "b" for get Bitcoin \n "bc" for get Bitcoin Cash \n "i" for get IOTA. For get all, please write "all"',
-    other: 'Write "info" for get information',
+    other: 'Write "info" for get information@',
 }
 
 
 bot.on('message', function (msg) {
   var fromId = msg.from.id;
-  var res = 'Start request';
 
-  rp('https://api.coinmarketcap.com/v1/ticker/', function (error, response, body) {
-      if (!error && response.statusCode == 200) {
-          body = JSON.parse(body);
-          var dataBitcoin = body[0];
-          var dataEther = body[1];
-          var dataBitcoinCash = body[2];
-          var dataIota = body[5];
-
-          answer.bitcoin = '~ Bitcoin now: $' + dataBitcoin.price_usd + '\nLast Update: ' + new Date(Number(dataBitcoin.last_updated + '000'));
-          answer.ether = '~ Ethereum now: $' + dataEther.price_usd + '\nLast Update: ' + new Date(Number(dataEther.last_updated + '000'));
-          answer.bitcoin_cash = '~ Bitcoin Cash now: $' + dataBitcoinCash.price_usd + '\n  Last Update: ' + new Date(Number(dataBitcoinCash.last_updated + '000'));
-          answer.iota = '~ IOTA now: $' + dataIota.price_usd + '\nLast Update: ' + new Date(Number(dataIota.last_updated + '000'));
-          sendMessage(fromId, msg.text);
-      } else {
-          error = 'Get data error';
-          sendMessage(fromId, error);
-      }
-  })
+  rp('https://api.coinmarketcap.com/v1/ticker/')
+    .then(function (body) {
+        handlerRequest(JSON.parse(body), fromId, msg.text);
+    })
+    .catch(function(err) {
+      console.log(err);
+    });
 });
 
+function handlerRequest(dataFromApi, fromId, fromMessageText) {
+  for (var i = 0; i < dataFromApi.length; i++) {
+    var currentItem = dataFromApi[i];
+
+    switch(currentItem.id) {
+      case 'bitcoin':
+        createMessage('bitcoin', dataFromApi[i]);
+        break;
+      case 'ethereum':
+        createMessage('ethereum', dataFromApi[i]);
+        break;
+      case 'bitcoin-cash':
+        createMessage('bitcoin-cash', dataFromApi[i]);
+        break;
+      case 'iota':
+        createMessage('iota', dataFromApi[i]);
+        break;
+    }
+
+    if (i == dataFromApi.length - 1) {
+      sendMessage(fromId, fromMessageText);
+    }
+  }
+}
+
+function createMessage(name, data) {
+  answer[name] = '~ ' + data.name + ' (' + data.symbol + ') ' + ' now: $' + data.price_usd + '\n'
+                + 'Last Update:  ' + new Date(Number(data.last_updated + '000')) + '\n'
+                + 'Percent change 1h:   ' + data.percent_change_1h + '\n'
+                + 'Percent change 24h: ' + data.percent_change_24h + '\n'
+                + 'Percent change 7d:   ' + data.percent_change_7d + '\n\n';
+}
+
 function sendMessage(fromId, fromMessageText) {
+  console.log(fromId, fromMessageText);
 
   fromMessageText = fromMessageText.toLowerCase();
 
   switch(fromMessageText) {
     case 'e':
-      bot.sendMessage(fromId, answer.ether);
+      bot.sendMessage(fromId, answer['ethereum']);
       break;
     case 'b':
-      bot.sendMessage(fromId, answer.bitcoin);
+      bot.sendMessage(fromId, answer['bitcoin']);
       break;
     case 'bc':
-      bot.sendMessage(fromId, answer.bitcoin_cash);
+      bot.sendMessage(fromId, answer['bitcoin-cash']);
       break;
     case 'i':
-      bot.sendMessage(fromId, answer.iota);
+      bot.sendMessage(fromId, answer['iota']);
       break;
     case 'all':
-      bot.sendMessage(fromId, answer.bitcoin + '\n' + answer.ether + '\n' + answer.bitcoin_cash + '\n' + answer.iota);
+      bot.sendMessage(fromId, answer['bitcoin'] + '\n' + answer['ethereum'] + '\n' + answer['bitcoin-cash'] + '\n' + answer['iota']);
       break;
     case 'info':
-      bot.sendMessage(fromId, answer.info);
+      bot.sendMessage(fromId, answer['info']);
       break;
     default:
-      bot.sendMessage(fromId, answer.other);
+      bot.sendMessage(fromId, answer['other']);
   }
 }
