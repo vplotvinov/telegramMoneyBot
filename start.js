@@ -39,6 +39,9 @@ function handlerRequest(dataFromApi, fromId, fromMessageText) {
       case 'iota':
         createMessage('iota', dataFromApi[i]);
         break;
+      case 'ripple':
+        createMessage('ripple', dataFromApi[i]);
+        break;
     }
 
     if (i == dataFromApi.length - 1) {
@@ -50,9 +53,9 @@ function handlerRequest(dataFromApi, fromId, fromMessageText) {
 function createMessage(name, data) {
   answer[name] = '~ ' + data.name + ' (' + data.symbol + ') ' + ' now: $' + data.price_usd + '\n'
                 + 'Last Update:  ' + new Date(Number(data.last_updated + '000')) + '\n'
-                + 'Percent change 1h:   ' + data.percent_change_1h + '\n'
-                + 'Percent change 24h: ' + data.percent_change_24h + '\n'
-                + 'Percent change 7d:   ' + data.percent_change_7d + '\n\n';
+                + 'Percent change 1h:   ' + data.percent_change_1h + '%\n'
+                + 'Percent change 24h: ' + data.percent_change_24h + '%\n'
+                + 'Percent change 7d:   ' + data.percent_change_7d + '%\n\n';
 }
 
 function sendMessage(fromId, fromMessageText) {
@@ -73,8 +76,11 @@ function sendMessage(fromId, fromMessageText) {
     case 'i':
       bot.sendMessage(fromId, answer['iota']);
       break;
+    case 'r':
+      bot.sendMessage(fromId, answer['ripple']);
+      break;
     case 'all':
-      bot.sendMessage(fromId, answer['bitcoin'] + '\n' + answer['ethereum'] + '\n' + answer['bitcoin-cash'] + '\n' + answer['iota']);
+      bot.sendMessage(fromId, answer['bitcoin'] + '\n' + answer['ethereum'] + '\n' + answer['bitcoin-cash'] + '\n' + answer['iota'] + '\n' + answer['ripple']);
       break;
     case 'info':
       bot.sendMessage(fromId, answer['info']);
