@@ -13,7 +13,7 @@ You can send command:
 <p>
 Result view:
 You got information with price, percent change
-<img src="img/screen.jpg" width="350" />
+<img src="img/screen.jpg" />
 </p>
 
 <p>
