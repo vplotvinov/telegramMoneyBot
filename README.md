@@ -1,7 +1,6 @@
 # telegramMoneyBot
 
-####This bot create for get real-time price cryptocurrency from https://coinmarketcap.com/
-
+This bot create for get real-time price cryptocurrency from https://coinmarketcap.com/
 
 You can send command:
 - <strong>all</strong> - for get all special coins from my side (BTC, ETH, BCH, IOTA, XRP, XLM)
