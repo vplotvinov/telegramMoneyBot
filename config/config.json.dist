@@ -1,0 +1,6 @@
+{
+    "token": {
+        "qa": "BOT_TOKEN_QA",
+        "prod": "BOT_TOKEN_PROD"
+    }
+}
